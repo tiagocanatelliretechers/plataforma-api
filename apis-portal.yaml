@@ -1,0 +1,2460 @@
+openapi: 3.0.3
+info:
+  title: Plataforma de Componentes + Backoffice API
+  version: 1.0.0
+  description: |-
+    API unificada da Plataforma de Componentes:
+    - Catálogo de componentes, versões e itens de configuração (ICs)
+    - Assistente de criação de componentes
+    - Governança, notificações e auditoria
+    - Gestão de usuários, times e perfis de acesso
+    - Backoffice de domínios e subdomínios de negócio
+servers:
+  - url: https://api.plataforma-componentes.interno
+tags:
+  - name: Autenticacao
+  - name: Usuarios
+  - name: Times
+  - name: Perfis de Acesso
+  - name: Permissoes
+  - name: Componentes
+  - name: Versoes
+  - name: Itens de Configuracao
+  - name: Assistente de Componentes
+  - name: Dominios
+  - name: Subdominios
+  - name: Governanca
+  - name: Notificacoes
+  - name: Admin
+  - name: Politicas de Dominio
+  - name: Estatisticas de Dominio
+
+paths:
+  /autenticacao/token:
+    post:
+      tags: [Autenticacao]
+      summary: Gera token de autenticação
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [login, senha]
+              properties:
+                login:
+                  type: string
+                senha:
+                  type: string
+            example:
+              login: "joao.silva"
+              senha: "senha-segura-123"
+      responses:
+        '200':
+          description: Token de autenticação gerado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [tokenAcesso, tipoToken, expiraEm]
+                properties:
+                  tokenAcesso:
+                    type: string
+                  tipoToken:
+                    type: string
+                  expiraEm:
+                    type: integer
+              example:
+                tokenAcesso: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                tipoToken: "Bearer"
+                expiraEm: 3600
+
+  /usuarios/me:
+    get:
+      tags: [Usuarios]
+      summary: Dados do usuário autenticado
+      responses:
+        '200':
+          description: Detalhes do usuário autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioDetalhe'
+              example:
+                idUsuario: "usr-001"
+                login: "joao.silva"
+                nomeExibicao: "João da Silva"
+                email: "joao.silva@empresa.com"
+                ativo: true
+                perfisAcesso:
+                  - idPerfilAcesso: "role-admin"
+                    nomePerfilAcesso: "Administrador Plataforma"
+                times:
+                  - idTime: "time-plataforma"
+                    nomeTime: "Time Plataforma Componentes"
+
+  /usuarios:
+    get:
+      tags: [Usuarios]
+      summary: Lista usuários
+      parameters:
+        - in: query
+          name: busca
+          schema:
+            type: string
+          description: Busca por login, nome ou e-mail
+        - in: query
+          name: timeId
+          schema:
+            type: string
+        - in: query
+          name: perfilAcessoId
+          schema:
+            type: string
+        - in: query
+          name: ativo
+          schema:
+            type: boolean
+        - in: query
+          name: pagina
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: tamanho
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Lista paginada de usuários
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginaUsuario'
+              example:
+                conteudo:
+                  - idUsuario: "usr-001"
+                    login: "joao.silva"
+                    nomeExibicao: "João da Silva"
+                    email: "joao.silva@empresa.com"
+                    ativo: true
+                  - idUsuario: "usr-002"
+                    login: "maria.souza"
+                    nomeExibicao: "Maria Souza"
+                    email: "maria.souza@empresa.com"
+                    ativo: true
+                pagina: 0
+                tamanho: 20
+                totalElementos: 2
+                totalPaginas: 1
+    post:
+      tags: [Usuarios]
+      summary: Cria usuário (gestão administrativa)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioCriarRequest'
+            example:
+              login: "joao.silva"
+              nomeExibicao: "João da Silva"
+              email: "joao.silva@empresa.com"
+              ativo: true
+              perfisAcessoIds: ["role-admin"]
+              timeIds: ["time-plataforma"]
+      responses:
+        '201':
+          description: Usuário criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioDetalhe'
+
+  /usuarios/{usuarioId}:
+    get:
+      tags: [Usuarios]
+      summary: Detalha usuário
+      parameters:
+        - in: path
+          name: usuarioId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detalhes do usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioDetalhe'
+    patch:
+      tags: [Usuarios]
+      summary: Atualiza usuário
+      parameters:
+        - in: path
+          name: usuarioId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioAtualizarRequest'
+            example:
+              nomeExibicao: "João Silva"
+              email: "joao.silva@empresa.com"
+              ativo: true
+      responses:
+        '200':
+          description: Usuário atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioDetalhe'
+
+  /usuarios/{usuarioId}/ativar:
+    post:
+      tags: [Usuarios]
+      summary: Reativa usuário
+      parameters:
+        - in: path
+          name: usuarioId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Usuário reativado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioDetalhe'
+
+  /usuarios/{usuarioId}/papeis:
+    get:
+      tags: [Usuarios]
+      summary: Lista perfis de acesso de um usuário
+      parameters:
+        - in: path
+          name: usuarioId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Perfis de acesso do usuário
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PerfilAcesso'
+    put:
+      tags: [Usuarios]
+      summary: Substitui perfis de acesso de um usuário
+      parameters:
+        - in: path
+          name: usuarioId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              description: Lista de IDs de perfis de acesso
+              items:
+                type: string
+            example:
+              - "role-admin"
+              - "role-visualizacao"
+      responses:
+        '200':
+          description: Perfis de acesso atualizados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PerfilAcesso'
+
+  /usuarios/{usuarioId}/times:
+    get:
+      tags: [Usuarios]
+      summary: Lista times de um usuário
+      parameters:
+        - in: path
+          name: usuarioId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Times do usuário
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Time'
+    put:
+      tags: [Usuarios]
+      summary: Substitui times de um usuário
+      parameters:
+        - in: path
+          name: usuarioId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              description: Lista de IDs de time
+              items:
+                type: string
+            example:
+              - "time-plataforma"
+              - "time-dom-pagamentos"
+      responses:
+        '200':
+          description: Times atualizados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Time'
+
+  /times:
+    get:
+      tags: [Times]
+      summary: Lista times
+      responses:
+        '200':
+          description: Lista de times
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Time'
+              example:
+                - idTime: "time-plataforma"
+                  nomeTime: "Time Plataforma Componentes"
+                  descricaoTime: "Time responsável pela plataforma de componentes."
+                - idTime: "time-dom-pagamentos"
+                  nomeTime: "Domínio Pagamentos"
+                  descricaoTime: "Time responsável pelo domínio de pagamentos."
+    post:
+      tags: [Times, Admin]
+      summary: Cria time
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeCriarRequest'
+            example:
+              nomeTime: "Time Plataforma Componentes"
+              descricaoTime: "Time responsável pela plataforma de componentes."
+      responses:
+        '201':
+          description: Time criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeDetalhe'
+
+  /times/{timeId}:
+    get:
+      tags: [Times]
+      summary: Detalha time
+      parameters:
+        - in: path
+          name: timeId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detalhes do time
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeDetalhe'
+    patch:
+      tags: [Times]
+      summary: Atualiza time
+      parameters:
+        - in: path
+          name: timeId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeAtualizarRequest'
+            example:
+              nomeTime: "Time Plataforma"
+              descricaoTime: "Time responsável pela plataforma de componentes."
+      responses:
+        '200':
+          description: Time atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeDetalhe'
+
+  /times/{timeId}/membros:
+    get:
+      tags: [Times]
+      summary: Lista membros de um time
+      parameters:
+        - in: path
+          name: timeId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Membros do time
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Usuario'
+    post:
+      tags: [Times]
+      summary: Adiciona membro em um time
+      parameters:
+        - in: path
+          name: timeId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [usuarioId]
+              properties:
+                usuarioId:
+                  type: string
+            example:
+              usuarioId: "usr-001"
+      responses:
+        '201':
+          description: Membro adicionado
+    delete:
+      tags: [Times]
+      summary: Remove membro de um time
+      parameters:
+        - in: path
+          name: timeId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: usuarioId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Membro removido
+
+  /perfis-acesso:
+    get:
+      tags: [Perfis de Acesso]
+      summary: Lista perfis de acesso
+      responses:
+        '200':
+          description: Lista de perfis de acesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PerfilAcesso'
+    post:
+      tags: [Perfis de Acesso, Admin]
+      summary: Cria perfil de acesso
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PerfilAcessoCriarRequest'
+            example:
+              nomePerfilAcesso: "Administrador Plataforma"
+              descricaoPerfilAcesso: "Acesso total à plataforma de componentes."
+              permissoesIds:
+                - "COMPONENTE_CADASTRAR"
+                - "DOMINIO_ADMINISTRAR"
+      responses:
+        '201':
+          description: Perfil de acesso criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilAcessoDetalhe'
+
+  /perfis-acesso/{perfilId}:
+    get:
+      tags: [Perfis de Acesso]
+      summary: Detalha perfil de acesso
+      parameters:
+        - in: path
+          name: perfilId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detalhes do perfil de acesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilAcessoDetalhe'
+    patch:
+      tags: [Perfis de Acesso]
+      summary: Atualiza perfil de acesso
+      parameters:
+        - in: path
+          name: perfilId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PerfilAcessoAtualizarRequest'
+            example:
+              descricaoPerfilAcesso: "Acesso total à plataforma, exceto gestão de usuários."
+              permissoesIds:
+                - "COMPONENTE_CADASTRAR"
+                - "DOMINIO_ADMINISTRAR"
+      responses:
+        '200':
+          description: Perfil de acesso atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilAcessoDetalhe'
+
+  /permissoes:
+    get:
+      tags: [Permissoes]
+      summary: Lista permissões disponíveis na plataforma
+      responses:
+        '200':
+          description: Lista de permissões
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permissao'
+
+  /componentes:
+    get:
+      tags: [Componentes]
+      summary: Lista componentes
+      parameters:
+        - in: query
+          name: busca
+          schema:
+            type: string
+          description: Busca por nome, código ou tag
+        - in: query
+          name: tipoComponente
+          schema:
+            type: string
+            enum: [BUSINESS, EXTENSION, TECHNICAL]
+        - in: query
+          name: dominioId
+          schema:
+            type: string
+        - in: query
+          name: estadoCicloVida
+          schema:
+            type: string
+        - in: query
+          name: pagina
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: tamanho
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Lista paginada de componentes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginaComponenteResumo'
+              example:
+                conteudo:
+                  - idComponente: "cmp-123"
+                    codigoComponente: "PAGTO_BOLETO"
+                    nomeComponente: "Parcelamento de Boletos"
+                    tipoComponente: "BUSINESS"
+                    dominioId: "dom-pagamentos"
+                    nomeDominio: "Pagamentos"
+                    subdominioId: "sub-parcelamento"
+                    nomeSubdominio: "Parcelamento"
+                    versaoMaisRecente: "1.0.0"
+                    estadoCicloVida: "EM_PRODUCAO"
+                  - idComponente: "cmp-456"
+                    codigoComponente: "CONS_DEBITOS"
+                    nomeComponente: "Consulta de Débitos Veiculares"
+                    tipoComponente: "BUSINESS"
+                    dominioId: "dom-veiculos"
+                    nomeDominio: "Veículos"
+                    subdominioId: "sub-consulta-debitos"
+                    nomeSubdominio: "Consulta de Débitos"
+                    versaoMaisRecente: "0.9.0"
+                    estadoCicloVida: "EM_HOMOLOGACAO"
+                pagina: 0
+                tamanho: 20
+                totalElementos: 2
+                totalPaginas: 1
+    post:
+      tags: [Componentes]
+      summary: Cria um novo componente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComponenteCriarRequest'
+            example:
+              codigoComponente: "PAGTO_BOLETO"
+              nomeComponente: "Parcelamento de Boletos"
+              tipoComponente: "BUSINESS"
+              dominioId: "dom-pagamentos"
+              subdominioId: "sub-parcelamento"
+              descricao: "Componente responsável pelo parcelamento de boletos de clientes."
+              timeResponsavelId: "time-plataforma-pagamentos"
+              tags:
+                - "pagamentos"
+                - "boletos"
+                - "parcelamento"
+      responses:
+        '201':
+          description: Componente criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponenteDetalhe'
+
+  /componentes/recentes:
+    get:
+      tags: [Componentes]
+      summary: Lista componentes acessados recentemente
+      responses:
+        '200':
+          description: Componentes recentes do usuário
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ComponenteResumo'
+
+  /componentes/estatisticas:
+    get:
+      tags: [Componentes]
+      summary: Estatísticas gerais de componentes
+      responses:
+        '200':
+          description: Estatísticas de componentes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstatisticasComponente'
+
+  /componentes/{componenteId}:
+    get:
+      tags: [Componentes]
+      summary: Detalha componente
+      parameters:
+        - in: path
+          name: componenteId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detalhes do componente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponenteDetalhe'
+    patch:
+      tags: [Componentes]
+      summary: Atualiza componente
+      parameters:
+        - in: path
+          name: componenteId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComponenteAtualizarRequest'
+            example:
+              nomeComponente: "Parcelamento de Boletos"
+              descricao: "Atualização de escopo do componente."
+              tags:
+                - "pagamentos"
+                - "boletos"
+                - "parcelamento"
+      responses:
+        '200':
+          description: Componente atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponenteDetalhe'
+
+  /componentes/{componenteId}/versoes:
+    get:
+      tags: [Versoes]
+      summary: Lista versões de um componente
+      parameters:
+        - in: path
+          name: componenteId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Versões do componente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VersaoComponenteResumo'
+    post:
+      tags: [Versoes]
+      summary: Cria nova versão de um componente
+      parameters:
+        - in: path
+          name: componenteId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersaoComponenteCriarRequest'
+            example:
+              versao: "1.1.0"
+              descricaoAlteracoes: "Inclusão de novos campos na API e melhoria de performance."
+              atributosQualidade:
+                disponibilidade: "99.9"
+                tempoRespostaMs: "500"
+      responses:
+        '201':
+          description: Versão criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersaoComponenteDetalhe'
+
+  /componentes/{componenteId}/versoes/{versaoId}:
+    get:
+      tags: [Versoes]
+      summary: Detalha versão de componente
+      parameters:
+        - in: path
+          name: componenteId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: versaoId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detalhes da versão
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersaoComponenteDetalhe'
+    patch:
+      tags: [Versoes]
+      summary: Atualiza versão de componente
+      parameters:
+        - in: path
+          name: componenteId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: versaoId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersaoComponenteAtualizarRequest'
+            example:
+              descricaoAlteracoes: "Ajuste de documentação e contratos."
+      responses:
+        '200':
+          description: Versão atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersaoComponenteDetalhe'
+
+  /componentes/{componenteId}/versoes/{versaoId}/ciclo-vida/transicoes:
+    post:
+      tags: [Governanca]
+      summary: Aplica transição de ciclo de vida em uma versão de componente
+      parameters:
+        - in: path
+          name: componenteId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: versaoId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [estadoDestino]
+              properties:
+                estadoDestino:
+                  type: string
+                comentario:
+                  type: string
+            example:
+              estadoDestino: "EM_PRODUCAO"
+              comentario: "Testes concluídos, liberando para produção."
+      responses:
+        '200':
+          description: Estado de ciclo de vida atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstadoCicloVidaDetalhe'
+
+  /componentes/{componenteId}/itens-configuracao:
+    get:
+      tags: [Itens de Configuracao]
+      summary: Lista itens de configuração (ICs) de um componente
+      parameters:
+        - in: path
+          name: componenteId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Itens de configuração do componente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ItemConfiguracaoResumo'
+
+  /componentes/{componenteId}/dependencias:
+    get:
+      tags: [Componentes]
+      summary: Lista dependências de um componente
+      parameters:
+        - in: path
+          name: componenteId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dependências do componente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependenciasComponente'
+
+  /componentes/{componenteId}/auditoria:
+    get:
+      tags: [Componentes]
+      summary: Lista eventos de auditoria do componente
+      parameters:
+        - in: path
+          name: componenteId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Entradas de auditoria do componente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RegistroAuditoria'
+
+  /assistentes/componentes:
+    post:
+      tags: [Assistente de Componentes]
+      summary: Inicia assistente de criação de componente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssistenteComponenteIniciarRequest'
+            example:
+              tipoComponente: "BUSINESS"
+              dominioId: "dom-pagamentos"
+              subdominioId: "sub-parcelamento"
+      responses:
+        '201':
+          description: Assistente iniciado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistenteComponente'
+
+  /assistentes/componentes/{rascunhoId}:
+    get:
+      tags: [Assistente de Componentes]
+      summary: Consulta estado do assistente de componente
+      parameters:
+        - in: path
+          name: rascunhoId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Rascunho do componente no assistente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistenteComponente'
+
+  /assistentes/componentes/{rascunhoId}/metadados:
+    patch:
+      tags: [Assistente de Componentes]
+      summary: Atualiza metadados do componente (etapa 1)
+      parameters:
+        - in: path
+          name: rascunhoId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssistenteComponenteMetadadosEtapa'
+            example:
+              codigoComponente: "PAGTO_BOLETO"
+              nomeComponente: "Parcelamento de Boletos"
+              descricao: "Componente responsável pelo parcelamento de boletos."
+              tags:
+                - "pagamentos"
+                - "boletos"
+                - "parcelamento"
+      responses:
+        '200':
+          description: Metadados atualizados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistenteComponente'
+
+  /assistentes/componentes/{rascunhoId}/versao:
+    patch:
+      tags: [Assistente de Componentes]
+      summary: Atualiza informações de versão inicial (etapa 2)
+      parameters:
+        - in: path
+          name: rascunhoId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssistenteComponenteVersaoEtapa'
+            example:
+              versao: "1.0.0"
+              descricaoAlteracoes: "Versão inicial do componente."
+      responses:
+        '200':
+          description: Versão inicial atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistenteComponente'
+
+  /assistentes/componentes/{rascunhoId}/itens-configuracao:
+    patch:
+      tags: [Assistente de Componentes]
+      summary: Atualiza itens de configuração (ICs) do componente (etapa 3)
+      parameters:
+        - in: path
+          name: rascunhoId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssistenteComponenteItensConfiguracaoEtapa'
+      responses:
+        '200':
+          description: Itens de configuração atualizados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistenteComponente'
+
+  /assistentes/componentes/{rascunhoId}/dependencias:
+    patch:
+      tags: [Assistente de Componentes]
+      summary: Atualiza dependências do componente (etapa 4)
+      parameters:
+        - in: path
+          name: rascunhoId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssistenteComponenteDependenciasEtapa'
+      responses:
+        '200':
+          description: Dependências atualizadas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistenteComponente'
+
+  /assistentes/componentes/{rascunhoId}/responsaveis:
+    patch:
+      tags: [Assistente de Componentes]
+      summary: Atualiza responsáveis do componente (etapa 5)
+      parameters:
+        - in: path
+          name: rascunhoId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssistenteComponenteResponsaveisEtapa'
+      responses:
+        '200':
+          description: Responsáveis atualizados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistenteComponente'
+
+  /assistentes/componentes/{rascunhoId}/qualidade:
+    patch:
+      tags: [Assistente de Componentes]
+      summary: Atualiza informações de qualidade e SLA (etapa 6)
+      parameters:
+        - in: path
+          name: rascunhoId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssistenteComponenteQualidadeEtapa'
+      responses:
+        '200':
+          description: Configurações de qualidade atualizadas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistenteComponente'
+
+  /assistentes/componentes/{rascunhoId}/enviar:
+    post:
+      tags: [Assistente de Componentes]
+      summary: Conclui o assistente e cria componente e primeira versão
+      parameters:
+        - in: path
+          name: rascunhoId
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Componente criado a partir do assistente
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [componente, versao]
+                properties:
+                  componente:
+                    $ref: '#/components/schemas/ComponenteDetalhe'
+                  versao:
+                    $ref: '#/components/schemas/VersaoComponenteDetalhe'
+
+  /itens-configuracao:
+    get:
+      tags: [Itens de Configuracao]
+      summary: Lista itens de configuração (ICs)
+      parameters:
+        - in: query
+          name: tipoIC
+          schema:
+            type: string
+          description: Tipo do IC (API, TOPIC, QUEUE, JOB, STORAGE, etc.)
+        - in: query
+          name: componenteId
+          schema:
+            type: string
+          description: Filtra pelos ICs de um componente
+      responses:
+        '200':
+          description: Lista de itens de configuração
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ItemConfiguracaoResumo'
+    post:
+      tags: [Itens de Configuracao]
+      summary: Cria um novo item de configuração (IC)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemConfiguracaoCriarRequest'
+            example:
+              tipoIC: "API"
+              nomeIC: "API Parcelamento de Boletos"
+              componenteId: "cmp-123"
+              descricao: "API principal de parcelamento de boletos."
+              identificadorExterno: "apim:PAGTO-BOLETO-v1"
+              ambiente: "PRODUCAO"
+              protocolo: "HTTPS"
+      responses:
+        '201':
+          description: Item de configuração criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemConfiguracaoDetalhe'
+
+  /itens-configuracao/{itemConfiguracaoId}:
+    get:
+      tags: [Itens de Configuracao]
+      summary: Detalha item de configuração
+      parameters:
+        - in: path
+          name: itemConfiguracaoId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detalhes do item de configuração
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemConfiguracaoDetalhe'
+    patch:
+      tags: [Itens de Configuracao]
+      summary: Atualiza item de configuração
+      parameters:
+        - in: path
+          name: itemConfiguracaoId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemConfiguracaoAtualizarRequest'
+      responses:
+        '200':
+          description: Item de configuração atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemConfiguracaoDetalhe'
+
+  /dominios:
+    get:
+      tags: [Dominios]
+      summary: Lista domínios de negócio
+      responses:
+        '200':
+          description: Domínios disponíveis
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dominio'
+
+  /dominios/{dominioId}/subdominios:
+    get:
+      tags: [Subdominios]
+      summary: Lista subdomínios de um domínio
+      parameters:
+        - in: path
+          name: dominioId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Subdomínios do domínio
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subdominio'
+
+  /governanca/solicitacoes-aprovacao:
+    get:
+      tags: [Governanca]
+      summary: Lista solicitações de aprovação pendentes
+      responses:
+        '200':
+          description: Solicitações de aprovação pendentes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SolicitacaoAprovacao'
+
+  /governanca/solicitacoes-aprovacao/{solicitacaoId}/decisao:
+    post:
+      tags: [Governanca]
+      summary: Registra decisão de aprovação ou rejeição
+      parameters:
+        - in: path
+          name: solicitacaoId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decisao]
+              properties:
+                decisao:
+                  type: string
+                  enum: [APROVAR, REJEITAR]
+                comentario:
+                  type: string
+            example:
+              decisao: "APROVAR"
+              comentario: "Atende aos critérios de governança."
+      responses:
+        '200':
+          description: Decisão registrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SolicitacaoAprovacao'
+
+  /notificacoes:
+    get:
+      tags: [Notificacoes]
+      summary: Lista notificações do usuário autenticado
+      responses:
+        '200':
+          description: Notificações do usuário
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notificacao'
+
+  /admin/dominios:
+    get:
+      tags: [Dominios, Admin]
+      summary: Lista domínios de negócio (backoffice)
+      parameters:
+        - in: query
+          name: busca
+          schema:
+            type: string
+        - in: query
+          name: ativo
+          schema:
+            type: boolean
+        - in: query
+          name: tipoDominio
+          schema:
+            type: string
+            enum: [BUSINESS, TECHNICAL, SUPPORT]
+        - in: query
+          name: timeResponsavelId
+          schema:
+            type: string
+        - in: query
+          name: pagina
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: tamanho
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Lista paginada de domínios
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginaDominio'
+    post:
+      tags: [Dominios, Admin]
+      summary: Cria domínio de negócio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DominioCriarRequest'
+      responses:
+        '201':
+          description: Domínio criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DominioDetalhe'
+
+  /admin/dominios/{dominioId}:
+    get:
+      tags: [Dominios, Admin]
+      summary: Detalha domínio
+      parameters:
+        - in: path
+          name: dominioId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detalhes do domínio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DominioDetalhe'
+    patch:
+      tags: [Dominios, Admin]
+      summary: Atualiza domínio
+      parameters:
+        - in: path
+          name: dominioId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DominioAtualizarRequest'
+      responses:
+        '200':
+          description: Domínio atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DominioDetalhe'
+    delete:
+      tags: [Dominios, Admin]
+      summary: Desativa domínio (soft delete)
+      parameters:
+        - in: path
+          name: dominioId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Domínio desativado
+
+  /admin/dominios/{dominioId}/ativar:
+    post:
+      tags: [Dominios, Admin]
+      summary: Reativa domínio desativado
+      parameters:
+        - in: path
+          name: dominioId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Domínio reativado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DominioDetalhe'
+
+  /admin/dominios/{dominioId}/responsaveis:
+    get:
+      tags: [Dominios, Admin]
+      summary: Consulta responsáveis de um domínio
+      parameters:
+        - in: path
+          name: dominioId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Responsáveis do domínio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponsaveisDominio'
+    put:
+      tags: [Dominios, Admin]
+      summary: Atualiza responsáveis de um domínio
+      parameters:
+        - in: path
+          name: dominioId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponsaveisDominioAtualizarRequest'
+      responses:
+        '200':
+          description: Responsáveis atualizados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponsaveisDominio'
+
+  /admin/dominios/{dominioId}/politicas:
+    get:
+      tags: [Politicas de Dominio, Admin]
+      summary: Consulta políticas de domínio
+      parameters:
+        - in: path
+          name: dominioId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Políticas do domínio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PoliticasDominio'
+    put:
+      tags: [Politicas de Dominio, Admin]
+      summary: Atualiza políticas de domínio
+      parameters:
+        - in: path
+          name: dominioId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PoliticasDominioAtualizarRequest'
+      responses:
+        '200':
+          description: Políticas atualizadas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PoliticasDominio'
+
+  /admin/dominios/{dominioId}/subdominios:
+    get:
+      tags: [Subdominios, Admin]
+      summary: Lista subdomínios de um domínio (backoffice)
+      parameters:
+        - in: path
+          name: dominioId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Subdomínios do domínio
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubdominioDetalhe'
+    post:
+      tags: [Subdominios, Admin]
+      summary: Cria subdomínio dentro de um domínio
+      parameters:
+        - in: path
+          name: dominioId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubdominioCriarRequest'
+      responses:
+        '201':
+          description: Subdomínio criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubdominioDetalhe'
+
+  /admin/subdominios/{subdominioId}:
+    get:
+      tags: [Subdominios, Admin]
+      summary: Detalha subdomínio
+      parameters:
+        - in: path
+          name: subdominioId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detalhes do subdomínio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubdominioDetalhe'
+    patch:
+      tags: [Subdominios, Admin]
+      summary: Atualiza subdomínio
+      parameters:
+        - in: path
+          name: subdominioId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubdominioAtualizarRequest'
+      responses:
+        '200':
+          description: Subdomínio atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubdominioDetalhe'
+    delete:
+      tags: [Subdominios, Admin]
+      summary: Desativa subdomínio (soft delete)
+      parameters:
+        - in: path
+          name: subdominioId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Subdomínio desativado
+
+  /admin/subdominios/{subdominioId}/ativar:
+    post:
+      tags: [Subdominios, Admin]
+      summary: Reativa subdomínio desativado
+      parameters:
+        - in: path
+          name: subdominioId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Subdomínio reativado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubdominioDetalhe'
+
+  /admin/dominios/{dominioId}/subdominios/reordenar:
+    patch:
+      tags: [Subdominios, Admin]
+      summary: Reordena lista de subdomínios de um domínio
+      parameters:
+        - in: path
+          name: dominioId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ordemSubdominios]
+              properties:
+                ordemSubdominios:
+                  type: array
+                  items:
+                    type: string
+            example:
+              ordemSubdominios:
+                - "sub-parcelamento"
+                - "sub-cobranca"
+      responses:
+        '200':
+          description: Ordem de subdomínios atualizada
+
+  /admin/dominios/{dominioId}/estatisticas:
+    get:
+      tags: [Estatisticas de Dominio, Admin]
+      summary: Estatísticas de uso de um domínio
+      parameters:
+        - in: path
+          name: dominioId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Estatísticas do domínio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstatisticasDominio'
+
+components:
+  schemas:
+    Usuario:
+      type: object
+      properties:
+        idUsuario:
+          type: string
+        login:
+          type: string
+        nomeExibicao:
+          type: string
+        email:
+          type: string
+        ativo:
+          type: boolean
+      example:
+        idUsuario: "usr-001"
+        login: "joao.silva"
+        nomeExibicao: "João da Silva"
+        email: "joao.silva@empresa.com"
+        ativo: true
+
+    UsuarioDetalhe:
+      allOf:
+        - $ref: '#/components/schemas/Usuario'
+        - type: object
+          properties:
+            perfisAcesso:
+              type: array
+              items:
+                $ref: '#/components/schemas/PerfilAcesso'
+            times:
+              type: array
+              items:
+                $ref: '#/components/schemas/Time'
+
+    UsuarioCriarRequest:
+      type: object
+      required: [login, email]
+      properties:
+        login:
+          type: string
+        nomeExibicao:
+          type: string
+        email:
+          type: string
+        ativo:
+          type: boolean
+        perfisAcessoIds:
+          type: array
+          items:
+            type: string
+        timeIds:
+          type: array
+          items:
+            type: string
+
+    UsuarioAtualizarRequest:
+      type: object
+      properties:
+        nomeExibicao:
+          type: string
+        email:
+          type: string
+        ativo:
+          type: boolean
+
+    PaginaUsuario:
+      type: object
+      properties:
+        conteudo:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsuarioDetalhe'
+        pagina:
+          type: integer
+        tamanho:
+          type: integer
+        totalElementos:
+          type: integer
+        totalPaginas:
+          type: integer
+
+    Time:
+      type: object
+      properties:
+        idTime:
+          type: string
+        nomeTime:
+          type: string
+        descricaoTime:
+          type: string
+
+    TimeDetalhe:
+      allOf:
+        - $ref: '#/components/schemas/Time'
+        - type: object
+          properties:
+            membros:
+              type: array
+              items:
+                $ref: '#/components/schemas/Usuario'
+
+    TimeCriarRequest:
+      type: object
+      required: [nomeTime]
+      properties:
+        nomeTime:
+          type: string
+        descricaoTime:
+          type: string
+
+    TimeAtualizarRequest:
+      type: object
+      properties:
+        nomeTime:
+          type: string
+        descricaoTime:
+          type: string
+
+    PerfilAcesso:
+      type: object
+      properties:
+        idPerfilAcesso:
+          type: string
+        nomePerfilAcesso:
+          type: string
+        descricaoPerfilAcesso:
+          type: string
+
+    PerfilAcessoDetalhe:
+      allOf:
+        - $ref: '#/components/schemas/PerfilAcesso'
+        - type: object
+          properties:
+            permissoes:
+              type: array
+              items:
+                $ref: '#/components/schemas/Permissao'
+
+    PerfilAcessoCriarRequest:
+      type: object
+      required: [nomePerfilAcesso]
+      properties:
+        nomePerfilAcesso:
+          type: string
+        descricaoPerfilAcesso:
+          type: string
+        permissoesIds:
+          type: array
+          items:
+            type: string
+
+    PerfilAcessoAtualizarRequest:
+      type: object
+      properties:
+        nomePerfilAcesso:
+          type: string
+        descricaoPerfilAcesso:
+          type: string
+        permissoesIds:
+          type: array
+          items:
+            type: string
+
+    Permissao:
+      type: object
+      properties:
+        idPermissao:
+          type: string
+        codigoPermissao:
+          type: string
+        descricaoPermissao:
+          type: string
+
+    ComponenteResumo:
+      type: object
+      properties:
+        idComponente:
+          type: string
+        codigoComponente:
+          type: string
+        nomeComponente:
+          type: string
+        tipoComponente:
+          type: string
+          description: Tipo do componente (BUSINESS, EXTENSION, TECHNICAL)
+        dominioId:
+          type: string
+        nomeDominio:
+          type: string
+        subdominioId:
+          type: string
+        nomeSubdominio:
+          type: string
+        versaoMaisRecente:
+          type: string
+        estadoCicloVida:
+          type: string
+
+    ComponenteDetalhe:
+      allOf:
+        - $ref: '#/components/schemas/ComponenteResumo'
+        - type: object
+          properties:
+            descricao:
+              type: string
+            timeResponsavelId:
+              type: string
+            timeResponsavelNome:
+              type: string
+            tags:
+              type: array
+              items:
+                type: string
+            dataCriacao:
+              type: string
+              format: date-time
+            dataAtualizacao:
+              type: string
+              format: date-time
+
+    ComponenteCriarRequest:
+      type: object
+      required: [codigoComponente, nomeComponente, tipoComponente]
+      properties:
+        codigoComponente:
+          type: string
+        nomeComponente:
+          type: string
+        tipoComponente:
+          type: string
+        dominioId:
+          type: string
+        subdominioId:
+          type: string
+        descricao:
+          type: string
+        timeResponsavelId:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    ComponenteAtualizarRequest:
+      type: object
+      properties:
+        nomeComponente:
+          type: string
+        descricao:
+          type: string
+        dominioId:
+          type: string
+        subdominioId:
+          type: string
+        timeResponsavelId:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    PaginaComponenteResumo:
+      type: object
+      properties:
+        conteudo:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponenteResumo'
+        pagina:
+          type: integer
+        tamanho:
+          type: integer
+        totalElementos:
+          type: integer
+        totalPaginas:
+          type: integer
+
+    VersaoComponenteResumo:
+      type: object
+      properties:
+        idVersaoComponente:
+          type: string
+        versao:
+          type: string
+        descricaoAlteracoes:
+          type: string
+        estadoCicloVida:
+          type: string
+        dataCriacao:
+          type: string
+          format: date-time
+
+    VersaoComponenteDetalhe:
+      allOf:
+        - $ref: '#/components/schemas/VersaoComponenteResumo'
+        - type: object
+          properties:
+            atributosQualidade:
+              type: object
+              additionalProperties:
+                type: string
+            itensConfiguracao:
+              type: array
+              items:
+                $ref: '#/components/schemas/ItemConfiguracaoResumo'
+            dependencias:
+              type: array
+              items:
+                $ref: '#/components/schemas/ComponenteResumo'
+
+    VersaoComponenteCriarRequest:
+      type: object
+      required: [versao]
+      properties:
+        versao:
+          type: string
+        descricaoAlteracoes:
+          type: string
+        atributosQualidade:
+          type: object
+          additionalProperties:
+            type: string
+
+    VersaoComponenteAtualizarRequest:
+      type: object
+      properties:
+        descricaoAlteracoes:
+          type: string
+        atributosQualidade:
+          type: object
+          additionalProperties:
+            type: string
+
+    EstatisticasComponente:
+      type: object
+      properties:
+        totalComponentes:
+          type: integer
+        totalComponentesBusiness:
+          type: integer
+        totalComponentesExtension:
+          type: integer
+        totalComponentesTechnical:
+          type: integer
+        totalDominios:
+          type: integer
+        totalSubdominios:
+          type: integer
+
+    DependenciasComponente:
+      type: object
+      properties:
+        dependenciasEntrada:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponenteResumo'
+        dependenciasSaida:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponenteResumo'
+
+    ItemConfiguracaoResumo:
+      type: object
+      properties:
+        idItemConfiguracao:
+          type: string
+        tipoIC:
+          type: string
+        nomeIC:
+          type: string
+        identificadorExterno:
+          type: string
+        componenteId:
+          type: string
+        nomeComponente:
+          type: string
+
+    ItemConfiguracaoDetalhe:
+      allOf:
+        - $ref: '#/components/schemas/ItemConfiguracaoResumo'
+        - type: object
+          properties:
+            descricao:
+              type: string
+            ambiente:
+              type: string
+            protocolo:
+              type: string
+
+    ItemConfiguracaoCriarRequest:
+      type: object
+      required: [tipoIC, nomeIC, componenteId]
+      properties:
+        tipoIC:
+          type: string
+        nomeIC:
+          type: string
+        componenteId:
+          type: string
+        descricao:
+          type: string
+        identificadorExterno:
+          type: string
+        ambiente:
+          type: string
+        protocolo:
+          type: string
+
+    ItemConfiguracaoAtualizarRequest:
+      type: object
+      properties:
+        nomeIC:
+          type: string
+        descricao:
+          type: string
+        identificadorExterno:
+          type: string
+        ambiente:
+          type: string
+        protocolo:
+          type: string
+
+    AssistenteComponente:
+      type: object
+      properties:
+        idRascunho:
+          type: string
+        etapaAtual:
+          type: string
+        metadados:
+          $ref: '#/components/schemas/AssistenteComponenteMetadadosEtapa'
+        versao:
+          $ref: '#/components/schemas/AssistenteComponenteVersaoEtapa'
+        itensConfiguracao:
+          $ref: '#/components/schemas/AssistenteComponenteItensConfiguracaoEtapa'
+        dependencias:
+          $ref: '#/components/schemas/AssistenteComponenteDependenciasEtapa'
+        responsaveis:
+          $ref: '#/components/schemas/AssistenteComponenteResponsaveisEtapa'
+        qualidade:
+          $ref: '#/components/schemas/AssistenteComponenteQualidadeEtapa'
+
+    AssistenteComponenteIniciarRequest:
+      type: object
+      properties:
+        tipoComponente:
+          type: string
+        dominioId:
+          type: string
+        subdominioId:
+          type: string
+
+    AssistenteComponenteMetadadosEtapa:
+      type: object
+      properties:
+        codigoComponente:
+          type: string
+        nomeComponente:
+          type: string
+        descricao:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    AssistenteComponenteVersaoEtapa:
+      type: object
+      properties:
+        versao:
+          type: string
+        descricaoAlteracoes:
+          type: string
+
+    AssistenteComponenteItensConfiguracaoEtapa:
+      type: object
+      properties:
+        itensConfiguracao:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemConfiguracaoCriarRequest'
+
+    AssistenteComponenteDependenciasEtapa:
+      type: object
+      properties:
+        componentesDependenciaIds:
+          type: array
+          items:
+            type: string
+
+    AssistenteComponenteResponsaveisEtapa:
+      type: object
+      properties:
+        timeResponsavelId:
+          type: string
+        timesCocriacaoIds:
+          type: array
+          items:
+            type: string
+
+    AssistenteComponenteQualidadeEtapa:
+      type: object
+      properties:
+        atributosQualidade:
+          type: object
+          additionalProperties:
+            type: string
+
+    Dominio:
+      type: object
+      properties:
+        idDominio:
+          type: string
+        codigoDominio:
+          type: string
+        nomeDominio:
+          type: string
+        tipoDominio:
+          type: string
+        ativo:
+          type: boolean
+
+    DominioDetalhe:
+      allOf:
+        - $ref: '#/components/schemas/Dominio'
+        - type: object
+          properties:
+            descricao:
+              type: string
+            timeResponsavelId:
+              type: string
+            timeResponsavelNome:
+              type: string
+
+    DominioCriarRequest:
+      type: object
+      required: [codigoDominio, nomeDominio]
+      properties:
+        codigoDominio:
+          type: string
+        nomeDominio:
+          type: string
+        tipoDominio:
+          type: string
+        descricao:
+          type: string
+        timeResponsavelId:
+          type: string
+
+    DominioAtualizarRequest:
+      type: object
+      properties:
+        nomeDominio:
+          type: string
+        tipoDominio:
+          type: string
+        descricao:
+          type: string
+        timeResponsavelId:
+          type: string
+        ativo:
+          type: boolean
+
+    PaginaDominio:
+      type: object
+      properties:
+        conteudo:
+          type: array
+          items:
+            $ref: '#/components/schemas/DominioDetalhe'
+        pagina:
+          type: integer
+        tamanho:
+          type: integer
+        totalElementos:
+          type: integer
+        totalPaginas:
+          type: integer
+
+    ResponsaveisDominio:
+      type: object
+      properties:
+        timeResponsavelId:
+          type: string
+        timesCocriacaoIds:
+          type: array
+          items:
+            type: string
+
+    ResponsaveisDominioAtualizarRequest:
+      type: object
+      properties:
+        timeResponsavelId:
+          type: string
+        timesCocriacaoIds:
+          type: array
+          items:
+            type: string
+
+    PoliticasDominio:
+      type: object
+      properties:
+        politicaCicloVida:
+          type: string
+        politicaAprovacao:
+          type: string
+        politicaVisibilidade:
+          type: string
+
+    PoliticasDominioAtualizarRequest:
+      type: object
+      properties:
+        politicaCicloVida:
+          type: string
+        politicaAprovacao:
+          type: string
+        politicaVisibilidade:
+          type: string
+
+    Subdominio:
+      type: object
+      properties:
+        idSubdominio:
+          type: string
+        dominioId:
+          type: string
+        codigoSubdominio:
+          type: string
+        nomeSubdominio:
+          type: string
+        ordemExibicao:
+          type: integer
+        ativo:
+          type: boolean
+
+    SubdominioDetalhe:
+      allOf:
+        - $ref: '#/components/schemas/Subdominio'
+        - type: object
+          properties:
+            descricao:
+              type: string
+
+    SubdominioCriarRequest:
+      type: object
+      required: [codigoSubdominio, nomeSubdominio]
+      properties:
+        codigoSubdominio:
+          type: string
+        nomeSubdominio:
+          type: string
+        descricao:
+          type: string
+
+    SubdominioAtualizarRequest:
+      type: object
+      properties:
+        nomeSubdominio:
+          type: string
+        descricao:
+          type: string
+        ordemExibicao:
+          type: integer
+        ativo:
+          type: boolean
+
+    EstatisticasDominio:
+      type: object
+      properties:
+        dominioId:
+          type: string
+        totalComponentes:
+          type: integer
+        totalComponentesBusiness:
+          type: integer
+        totalComponentesExtension:
+          type: integer
+        totalComponentesTechnical:
+          type: integer
+
+    SolicitacaoAprovacao:
+      type: object
+      properties:
+        idSolicitacao:
+          type: string
+        tipoSolicitacao:
+          type: string
+        estadoSolicitacao:
+          type: string
+        solicitadoPor:
+          $ref: '#/components/schemas/Usuario'
+        dataSolicitacao:
+          type: string
+          format: date-time
+        idAlvo:
+          type: string
+        tipoAlvo:
+          type: string
+
+    EstadoCicloVidaDetalhe:
+      type: object
+      properties:
+        estado:
+          type: string
+        alteradoPor:
+          $ref: '#/components/schemas/Usuario'
+        dataAlteracao:
+          type: string
+          format: date-time
+        comentario:
+          type: string
+
+    RegistroAuditoria:
+      type: object
+      properties:
+        idRegistroAuditoria:
+          type: string
+        idEntidade:
+          type: string
+        tipoEntidade:
+          type: string
+        acao:
+          type: string
+        autor:
+          $ref: '#/components/schemas/Usuario'
+        dataRegistro:
+          type: string
+          format: date-time
+        detalhes:
+          type: object
+          additionalProperties:
+            type: string
+
+    Notificacao:
+      type: object
+      properties:
+        idNotificacao:
+          type: string
+        tipoNotificacao:
+          type: string
+        titulo:
+          type: string
+        mensagem:
+          type: string
+        lida:
+          type: boolean
+        dataCriacao:
+          type: string
+          format: date-time
