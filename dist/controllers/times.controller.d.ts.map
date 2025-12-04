@@ -1,0 +1,1 @@
+{"version":3,"file":"times.controller.d.ts","sourceRoot":"","sources":["../../src/controllers/times.controller.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAI5C,eAAO,MAAM,eAAe;wBAEN,OAAO,OAAO,QAAQ;qBAKzB,OAAO,OAAO,QAAQ;qBAUtB,OAAO,OAAO,QAAQ;yBAWlB,OAAO,OAAO,QAAQ;8BAYjB,OAAO,OAAO,QAAQ;gCAKpB,OAAO,OAAO,QAAQ;8BAKxB,OAAO,OAAO,QAAQ;CAGjD,CAAC"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"permissoes.controller.js","sourceRoot":"","sources":["../../src/controllers/permissoes.controller.ts"],"names":[],"mappings":";;;AACA,sEAA8D;AAEjD,QAAA,oBAAoB,GAAG;IAClC,kBAAkB;IAClB,gBAAgB,EAAE,CAAC,IAAa,EAAE,GAAa,EAAE,EAAE;QACjD,GAAG,CAAC,MAAM,CAAC,GAAG,CAAC,CAAC,IAAI,CAAC,oCAAc,CAAC,CAAC;IACvC,CAAC;CACF,CAAC"}

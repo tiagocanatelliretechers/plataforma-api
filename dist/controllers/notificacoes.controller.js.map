@@ -1,0 +1,1 @@
+{"version":3,"file":"notificacoes.controller.js","sourceRoot":"","sources":["../../src/controllers/notificacoes.controller.ts"],"names":[],"mappings":";;;AACA,oEAA+D;AAElD,QAAA,sBAAsB,GAAG;IACpC,oBAAoB;IACpB,kBAAkB,EAAE,CAAC,IAAa,EAAE,GAAa,EAAE,EAAE;QACnD,GAAG,CAAC,MAAM,CAAC,GAAG,CAAC,CAAC,IAAI,CAAC,qCAAgB,CAAC,CAAC;IACzC,CAAC;CACF,CAAC"}
