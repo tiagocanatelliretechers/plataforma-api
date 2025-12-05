@@ -1,8 +1,8 @@
 {
   "info": {
-    "_postman_id": "plataforma-componentes-api",
-    "name": "Plataforma de Componentes API",
-    "description": "API unificada da Plataforma de Componentes:\n- Catálogo de componentes, versões e itens de configuração (ICs)\n- Assistente de criação de componentes\n- Governança, notificações e auditoria\n- Gestão de usuários, times e perfis de acesso\n- Backoffice de domínios e subdomínios de negócio",
+    "_postman_id": "plataforma-componentes-api-v2",
+    "name": "Plataforma de Componentes API v1.1",
+    "description": "API focada em:\n- Autenticação (login)\n- Layout da área logada (menu, usuário logado, branding)\n- Dashboard (tela única, front burro)\n- Gestão de usuários (CRUD + telas)\n- Lista de componentes (tela única)\n- Wizard de criação de componentes (tela única, steps)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -47,7 +47,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"login\": \"joao.silva\",\n  \"senha\": \"senha-segura-123\"\n}"
+              "raw": "{\n  \"login\": \"joao.silva\",\n  \"senha\": \"Senha@Forte123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/autenticacao/token",
@@ -60,10 +60,10 @@
       ]
     },
     {
-      "name": "Usuários",
+      "name": "UI - Layout",
       "item": [
         {
-          "name": "Obter Usuário Autenticado",
+          "name": "Obter Layout da Área Logada",
           "request": {
             "method": "GET",
             "header": [
@@ -73,13 +73,186 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/usuarios/me",
+              "raw": "{{baseUrl}}/ui/layout",
               "host": ["{{baseUrl}}"],
-              "path": ["usuarios", "me"]
+              "path": ["ui", "layout"]
             },
-            "description": "Dados do usuário autenticado"
+            "description": "Retorna o contexto da área logada (app, usuário, menu)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "UI - Dashboard",
+      "item": [
+        {
+          "name": "Obter Dados do Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ui/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["ui", "dashboard"]
+            },
+            "description": "Monta a tela de Dashboard da plataforma com cards, gráfico, eventos e integrações"
+          }
+        }
+      ]
+    },
+    {
+      "name": "UI - Usuários",
+      "item": [
+        {
+          "name": "Tela de Listagem de Usuários",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ui/usuarios/lista?pagina=0&tamanho=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["ui", "usuarios", "lista"],
+              "query": [
+                {
+                  "key": "pagina",
+                  "value": "0"
+                },
+                {
+                  "key": "tamanho",
+                  "value": "20"
+                },
+                {
+                  "key": "busca",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "ativo",
+                  "value": "true",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Monta tela de listagem de usuários com filtros, colunas e dados"
           }
         },
+        {
+          "name": "Tela de Criação de Usuário",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ui/usuarios/form-criacao",
+              "host": ["{{baseUrl}}"],
+              "path": ["ui", "usuarios", "form-criacao"]
+            },
+            "description": "Retorna metadados do formulário de criação de usuário"
+          }
+        },
+        {
+          "name": "Tela de Edição de Usuário",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ui/usuarios/usr-0001/form-edicao",
+              "host": ["{{baseUrl}}"],
+              "path": ["ui", "usuarios", "usr-0001", "form-edicao"]
+            },
+            "description": "Retorna metadados do formulário + valores atuais do usuário para edição"
+          }
+        }
+      ]
+    },
+    {
+      "name": "UI - Componentes",
+      "item": [
+        {
+          "name": "Tela de Listagem de Componentes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ui/componentes/lista?pagina=0&tamanho=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["ui", "componentes", "lista"],
+              "query": [
+                {
+                  "key": "pagina",
+                  "value": "0"
+                },
+                {
+                  "key": "tamanho",
+                  "value": "20"
+                },
+                {
+                  "key": "busca",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "tipoComponente",
+                  "value": "BUSINESS",
+                  "disabled": true
+                },
+                {
+                  "key": "dominioId",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Monta tela de listagem de componentes com filtros, colunas e dados"
+          }
+        },
+        {
+          "name": "Wizard de Criação de Componente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ui/componentes/form-criacao",
+              "host": ["{{baseUrl}}"],
+              "path": ["ui", "componentes", "form-criacao"]
+            },
+            "description": "Retorna a definição completa do wizard (steps, fields, validações)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuários - CRUD",
+      "item": [
         {
           "name": "Listar Usuários",
           "request": {
@@ -96,26 +269,6 @@
               "path": ["usuarios"],
               "query": [
                 {
-                  "key": "busca",
-                  "value": "",
-                  "disabled": true
-                },
-                {
-                  "key": "timeId",
-                  "value": "",
-                  "disabled": true
-                },
-                {
-                  "key": "perfilAcessoId",
-                  "value": "",
-                  "disabled": true
-                },
-                {
-                  "key": "ativo",
-                  "value": "true",
-                  "disabled": true
-                },
-                {
                   "key": "pagina",
                   "value": "0"
                 },
@@ -125,7 +278,7 @@
                 }
               ]
             },
-            "description": "Lista usuários com paginação"
+            "description": "Lista usuários (uso interno / integrações)"
           }
         },
         {
@@ -144,14 +297,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"login\": \"novo.usuario\",\n  \"nomeExibicao\": \"Novo Usuário\",\n  \"email\": \"novo.usuario@empresa.com\",\n  \"ativo\": true,\n  \"perfisAcessoIds\": [\"role-admin\"],\n  \"timeIds\": [\"time-plataforma\"]\n}"
+              "raw": "{\n  \"login\": \"joao.silva\",\n  \"nomeExibicao\": \"João da Silva\",\n  \"email\": \"joao.silva@porto.com.br\",\n  \"ativo\": true,\n  \"perfisAcessoIds\": [\n    \"ROLE_ADMIN\",\n    \"ROLE_VIEWER\"\n  ],\n  \"timeIds\": [\n    \"time-plataforma\"\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/usuarios",
               "host": ["{{baseUrl}}"],
               "path": ["usuarios"]
             },
-            "description": "Cria usuário (gestão administrativa)"
+            "description": "Cria usuário"
           }
         },
         {
@@ -165,9 +318,9 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/usuarios/usr-001",
+              "raw": "{{baseUrl}}/usuarios/usr-0001",
               "host": ["{{baseUrl}}"],
-              "path": ["usuarios", "usr-001"]
+              "path": ["usuarios", "usr-0001"]
             },
             "description": "Detalha usuário"
           }
@@ -188,403 +341,20 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nomeExibicao\": \"João Silva Atualizado\",\n  \"email\": \"joao.silva@empresa.com\",\n  \"ativo\": true\n}"
+              "raw": "{\n  \"nomeExibicao\": \"João da Silva Neto\",\n  \"email\": \"joao.silva.neto@porto.com.br\",\n  \"ativo\": true,\n  \"perfisAcessoIds\": [\n    \"ROLE_ADMIN\"\n  ],\n  \"timeIds\": [\n    \"time-plataforma\",\n    \"time-dom-pagamentos\"\n  ]\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/usuarios/usr-001",
+              "raw": "{{baseUrl}}/usuarios/usr-0001",
               "host": ["{{baseUrl}}"],
-              "path": ["usuarios", "usr-001"]
+              "path": ["usuarios", "usr-0001"]
             },
             "description": "Atualiza usuário"
           }
-        },
-        {
-          "name": "Ativar Usuário",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/usuarios/usr-001/ativar",
-              "host": ["{{baseUrl}}"],
-              "path": ["usuarios", "usr-001", "ativar"]
-            },
-            "description": "Reativa usuário"
-          }
-        },
-        {
-          "name": "Listar Perfis de Acesso do Usuário",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/usuarios/usr-001/papeis",
-              "host": ["{{baseUrl}}"],
-              "path": ["usuarios", "usr-001", "papeis"]
-            },
-            "description": "Lista perfis de acesso de um usuário"
-          }
-        },
-        {
-          "name": "Substituir Perfis de Acesso do Usuário",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "[\"role-admin\", \"role-visualizacao\"]"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/usuarios/usr-001/papeis",
-              "host": ["{{baseUrl}}"],
-              "path": ["usuarios", "usr-001", "papeis"]
-            },
-            "description": "Substitui perfis de acesso de um usuário"
-          }
-        },
-        {
-          "name": "Listar Times do Usuário",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/usuarios/usr-001/times",
-              "host": ["{{baseUrl}}"],
-              "path": ["usuarios", "usr-001", "times"]
-            },
-            "description": "Lista times de um usuário"
-          }
-        },
-        {
-          "name": "Substituir Times do Usuário",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "[\"time-plataforma\", \"time-dom-pagamentos\"]"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/usuarios/usr-001/times",
-              "host": ["{{baseUrl}}"],
-              "path": ["usuarios", "usr-001", "times"]
-            },
-            "description": "Substitui times de um usuário"
-          }
         }
       ]
     },
     {
-      "name": "Times",
-      "item": [
-        {
-          "name": "Listar Times",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/times",
-              "host": ["{{baseUrl}}"],
-              "path": ["times"]
-            },
-            "description": "Lista times"
-          }
-        },
-        {
-          "name": "Criar Time",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nomeTime\": \"Time Plataforma Componentes\",\n  \"descricaoTime\": \"Time responsável pela plataforma de componentes.\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/times",
-              "host": ["{{baseUrl}}"],
-              "path": ["times"]
-            },
-            "description": "Cria time"
-          }
-        },
-        {
-          "name": "Obter Time por ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/times/time-plataforma",
-              "host": ["{{baseUrl}}"],
-              "path": ["times", "time-plataforma"]
-            },
-            "description": "Detalha time"
-          }
-        },
-        {
-          "name": "Atualizar Time",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nomeTime\": \"Time Plataforma\",\n  \"descricaoTime\": \"Time responsável pela plataforma de componentes.\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/times/time-plataforma",
-              "host": ["{{baseUrl}}"],
-              "path": ["times", "time-plataforma"]
-            },
-            "description": "Atualiza time"
-          }
-        },
-        {
-          "name": "Listar Membros do Time",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/times/time-plataforma/membros",
-              "host": ["{{baseUrl}}"],
-              "path": ["times", "time-plataforma", "membros"]
-            },
-            "description": "Lista membros de um time"
-          }
-        },
-        {
-          "name": "Adicionar Membro ao Time",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"usuarioId\": \"usr-001\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/times/time-plataforma/membros",
-              "host": ["{{baseUrl}}"],
-              "path": ["times", "time-plataforma", "membros"]
-            },
-            "description": "Adiciona membro em um time"
-          }
-        },
-        {
-          "name": "Remover Membro do Time",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/times/time-plataforma/membros?usuarioId=usr-001",
-              "host": ["{{baseUrl}}"],
-              "path": ["times", "time-plataforma", "membros"],
-              "query": [
-                {
-                  "key": "usuarioId",
-                  "value": "usr-001"
-                }
-              ]
-            },
-            "description": "Remove membro de um time"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Perfis de Acesso",
-      "item": [
-        {
-          "name": "Listar Perfis de Acesso",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/perfis-acesso",
-              "host": ["{{baseUrl}}"],
-              "path": ["perfis-acesso"]
-            },
-            "description": "Lista perfis de acesso"
-          }
-        },
-        {
-          "name": "Criar Perfil de Acesso",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nomePerfilAcesso\": \"Administrador Plataforma\",\n  \"descricaoPerfilAcesso\": \"Acesso total à plataforma de componentes.\",\n  \"permissoesIds\": [\n    \"COMPONENTE_CADASTRAR\",\n    \"DOMINIO_ADMINISTRAR\"\n  ]\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/perfis-acesso",
-              "host": ["{{baseUrl}}"],
-              "path": ["perfis-acesso"]
-            },
-            "description": "Cria perfil de acesso"
-          }
-        },
-        {
-          "name": "Obter Perfil de Acesso por ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/perfis-acesso/role-admin",
-              "host": ["{{baseUrl}}"],
-              "path": ["perfis-acesso", "role-admin"]
-            },
-            "description": "Detalha perfil de acesso"
-          }
-        },
-        {
-          "name": "Atualizar Perfil de Acesso",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"descricaoPerfilAcesso\": \"Acesso total à plataforma, exceto gestão de usuários.\",\n  \"permissoesIds\": [\n    \"COMPONENTE_CADASTRAR\",\n    \"DOMINIO_ADMINISTRAR\"\n  ]\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/perfis-acesso/role-admin",
-              "host": ["{{baseUrl}}"],
-              "path": ["perfis-acesso", "role-admin"]
-            },
-            "description": "Atualiza perfil de acesso"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Permissões",
-      "item": [
-        {
-          "name": "Listar Permissões",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/permissoes",
-              "host": ["{{baseUrl}}"],
-              "path": ["permissoes"]
-            },
-            "description": "Lista permissões disponíveis na plataforma"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Componentes",
+      "name": "Componentes - CRUD",
       "item": [
         {
           "name": "Listar Componentes",
@@ -602,26 +372,6 @@
               "path": ["componentes"],
               "query": [
                 {
-                  "key": "busca",
-                  "value": "",
-                  "disabled": true
-                },
-                {
-                  "key": "tipoComponente",
-                  "value": "BUSINESS",
-                  "disabled": true
-                },
-                {
-                  "key": "dominioId",
-                  "value": "",
-                  "disabled": true
-                },
-                {
-                  "key": "estadoCicloVida",
-                  "value": "",
-                  "disabled": true
-                },
-                {
                   "key": "pagina",
                   "value": "0"
                 },
@@ -631,11 +381,11 @@
                 }
               ]
             },
-            "description": "Lista componentes com paginação"
+            "description": "Lista componentes (uso interno / integrações)"
           }
         },
         {
-          "name": "Criar Componente",
+          "name": "Criar Componente (via Wizard)",
           "request": {
             "method": "POST",
             "header": [
@@ -650,50 +400,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"codigoComponente\": \"PAGTO_BOLETO\",\n  \"nomeComponente\": \"Parcelamento de Boletos\",\n  \"tipoComponente\": \"BUSINESS\",\n  \"dominioId\": \"dom-pagamentos\",\n  \"subdominioId\": \"sub-parcelamento\",\n  \"descricao\": \"Componente responsável pelo parcelamento de boletos de clientes.\",\n  \"timeResponsavelId\": \"time-plataforma-pagamentos\",\n  \"tags\": [\n    \"pagamentos\",\n    \"boletos\",\n    \"parcelamento\"\n  ]\n}"
+              "raw": "{\n  \"tipoComponente\": \"business\",\n  \"nomeComponente\": \"Aprovação de Reserva de Veículos\",\n  \"valueStreamId\": \"vs-reservas-veiculos\",\n  \"teamId\": \"time-reservas-veiculos\",\n  \"tags\": [\n    \"reservas\",\n    \"frota\",\n    \"aprovacao\"\n  ],\n  \"descricao\": \"Componente responsável pela jornada de aprovação de reservas de veículos corporativos.\",\n  \"extensionComponents\": [\n    \"cmp-ext-aprovacao-geral\"\n  ],\n  \"technicalComponents\": [\n    \"cmp-tech-sso\",\n    \"cmp-tech-email-smtp\"\n  ],\n  \"infrastructureConfigs\": [\n    \"create-microfrontend\",\n    \"configure-api-gateway\"\n  ],\n  \"automations\": [\n    \"create-git-repo\",\n    \"create-ci-cd-pipeline\",\n    \"create-jira-cards\"\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/componentes",
               "host": ["{{baseUrl}}"],
               "path": ["componentes"]
             },
-            "description": "Cria um novo componente"
-          }
-        },
-        {
-          "name": "Listar Componentes Recentes",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/componentes/recentes",
-              "host": ["{{baseUrl}}"],
-              "path": ["componentes", "recentes"]
-            },
-            "description": "Lista componentes acessados recentemente"
-          }
-        },
-        {
-          "name": "Obter Estatísticas de Componentes",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/componentes/estatisticas",
-              "host": ["{{baseUrl}}"],
-              "path": ["componentes", "estatisticas"]
-            },
-            "description": "Estatísticas gerais de componentes"
+            "description": "Cria um novo componente (payload consolidado do wizard)"
           }
         },
         {
@@ -707,1071 +421,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/componentes/cmp-123",
+              "raw": "{{baseUrl}}/componentes/cmp-000123",
               "host": ["{{baseUrl}}"],
-              "path": ["componentes", "cmp-123"]
+              "path": ["componentes", "cmp-000123"]
             },
-            "description": "Detalha componente"
-          }
-        },
-        {
-          "name": "Atualizar Componente",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nomeComponente\": \"Parcelamento de Boletos\",\n  \"descricao\": \"Atualização de escopo do componente.\",\n  \"tags\": [\n    \"pagamentos\",\n    \"boletos\",\n    \"parcelamento\"\n  ]\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/componentes/cmp-123",
-              "host": ["{{baseUrl}}"],
-              "path": ["componentes", "cmp-123"]
-            },
-            "description": "Atualiza componente"
-          }
-        },
-        {
-          "name": "Listar Itens de Configuração do Componente",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/componentes/cmp-123/itens-configuracao",
-              "host": ["{{baseUrl}}"],
-              "path": ["componentes", "cmp-123", "itens-configuracao"]
-            },
-            "description": "Lista itens de configuração (ICs) de um componente"
-          }
-        },
-        {
-          "name": "Obter Dependências do Componente",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/componentes/cmp-123/dependencias",
-              "host": ["{{baseUrl}}"],
-              "path": ["componentes", "cmp-123", "dependencias"]
-            },
-            "description": "Lista dependências de um componente"
-          }
-        },
-        {
-          "name": "Listar Auditoria do Componente",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/componentes/cmp-123/auditoria",
-              "host": ["{{baseUrl}}"],
-              "path": ["componentes", "cmp-123", "auditoria"]
-            },
-            "description": "Lista eventos de auditoria do componente"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Versões",
-      "item": [
-        {
-          "name": "Listar Versões do Componente",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/componentes/cmp-123/versoes",
-              "host": ["{{baseUrl}}"],
-              "path": ["componentes", "cmp-123", "versoes"]
-            },
-            "description": "Lista versões de um componente"
-          }
-        },
-        {
-          "name": "Criar Versão",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"versao\": \"1.1.0\",\n  \"descricaoAlteracoes\": \"Inclusão de novos campos na API e melhoria de performance.\",\n  \"atributosQualidade\": {\n    \"disponibilidade\": \"99.9\",\n    \"tempoRespostaMs\": \"500\"\n  }\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/componentes/cmp-123/versoes",
-              "host": ["{{baseUrl}}"],
-              "path": ["componentes", "cmp-123", "versoes"]
-            },
-            "description": "Cria nova versão de um componente"
-          }
-        },
-        {
-          "name": "Obter Versão por ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/componentes/cmp-123/versoes/ver-001",
-              "host": ["{{baseUrl}}"],
-              "path": ["componentes", "cmp-123", "versoes", "ver-001"]
-            },
-            "description": "Detalha versão de componente"
-          }
-        },
-        {
-          "name": "Atualizar Versão",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"descricaoAlteracoes\": \"Ajuste de documentação e contratos.\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/componentes/cmp-123/versoes/ver-001",
-              "host": ["{{baseUrl}}"],
-              "path": ["componentes", "cmp-123", "versoes", "ver-001"]
-            },
-            "description": "Atualiza versão de componente"
-          }
-        },
-        {
-          "name": "Aplicar Transição de Ciclo de Vida",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"estadoDestino\": \"EM_PRODUCAO\",\n  \"comentario\": \"Testes concluídos, liberando para produção.\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/componentes/cmp-123/versoes/ver-001/ciclo-vida/transicoes",
-              "host": ["{{baseUrl}}"],
-              "path": ["componentes", "cmp-123", "versoes", "ver-001", "ciclo-vida", "transicoes"]
-            },
-            "description": "Aplica transição de ciclo de vida em uma versão de componente"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Itens de Configuração",
-      "item": [
-        {
-          "name": "Listar Itens de Configuração",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/itens-configuracao",
-              "host": ["{{baseUrl}}"],
-              "path": ["itens-configuracao"],
-              "query": [
-                {
-                  "key": "tipoIC",
-                  "value": "API",
-                  "disabled": true
-                },
-                {
-                  "key": "componenteId",
-                  "value": "cmp-123",
-                  "disabled": true
-                }
-              ]
-            },
-            "description": "Lista itens de configuração (ICs)"
-          }
-        },
-        {
-          "name": "Criar Item de Configuração",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"tipoIC\": \"API\",\n  \"nomeIC\": \"API Parcelamento de Boletos\",\n  \"componenteId\": \"cmp-123\",\n  \"descricao\": \"API principal de parcelamento de boletos.\",\n  \"identificadorExterno\": \"apim:PAGTO-BOLETO-v1\",\n  \"ambiente\": \"PRODUCAO\",\n  \"protocolo\": \"HTTPS\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/itens-configuracao",
-              "host": ["{{baseUrl}}"],
-              "path": ["itens-configuracao"]
-            },
-            "description": "Cria um novo item de configuração (IC)"
-          }
-        },
-        {
-          "name": "Obter Item de Configuração por ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/itens-configuracao/ic-001",
-              "host": ["{{baseUrl}}"],
-              "path": ["itens-configuracao", "ic-001"]
-            },
-            "description": "Detalha item de configuração"
-          }
-        },
-        {
-          "name": "Atualizar Item de Configuração",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nomeIC\": \"API Parcelamento de Boletos v2\",\n  \"descricao\": \"API atualizada de parcelamento de boletos.\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/itens-configuracao/ic-001",
-              "host": ["{{baseUrl}}"],
-              "path": ["itens-configuracao", "ic-001"]
-            },
-            "description": "Atualiza item de configuração"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Assistente de Componentes",
-      "item": [
-        {
-          "name": "Iniciar Assistente",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"tipoComponente\": \"BUSINESS\",\n  \"dominioId\": \"dom-pagamentos\",\n  \"subdominioId\": \"sub-parcelamento\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/assistentes/componentes",
-              "host": ["{{baseUrl}}"],
-              "path": ["assistentes", "componentes"]
-            },
-            "description": "Inicia assistente de criação de componente"
-          }
-        },
-        {
-          "name": "Obter Estado do Assistente",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/assistentes/componentes/rascunho-001",
-              "host": ["{{baseUrl}}"],
-              "path": ["assistentes", "componentes", "rascunho-001"]
-            },
-            "description": "Consulta estado do assistente de componente"
-          }
-        },
-        {
-          "name": "Atualizar Metadados (Etapa 1)",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codigoComponente\": \"PAGTO_BOLETO\",\n  \"nomeComponente\": \"Parcelamento de Boletos\",\n  \"descricao\": \"Componente responsável pelo parcelamento de boletos.\",\n  \"tags\": [\n    \"pagamentos\",\n    \"boletos\",\n    \"parcelamento\"\n  ]\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/assistentes/componentes/rascunho-001/metadados",
-              "host": ["{{baseUrl}}"],
-              "path": ["assistentes", "componentes", "rascunho-001", "metadados"]
-            },
-            "description": "Atualiza metadados do componente (etapa 1)"
-          }
-        },
-        {
-          "name": "Atualizar Versão (Etapa 2)",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"versao\": \"1.0.0\",\n  \"descricaoAlteracoes\": \"Versão inicial do componente.\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/assistentes/componentes/rascunho-001/versao",
-              "host": ["{{baseUrl}}"],
-              "path": ["assistentes", "componentes", "rascunho-001", "versao"]
-            },
-            "description": "Atualiza informações de versão inicial (etapa 2)"
-          }
-        },
-        {
-          "name": "Atualizar Itens de Configuração (Etapa 3)",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"itensConfiguracao\": [\n    {\n      \"tipoIC\": \"API\",\n      \"nomeIC\": \"API Parcelamento\",\n      \"componenteId\": \"cmp-123\",\n      \"descricao\": \"API principal\",\n      \"identificadorExterno\": \"apim:PAGTO-BOLETO-v1\",\n      \"ambiente\": \"PRODUCAO\",\n      \"protocolo\": \"HTTPS\"\n    }\n  ]\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/assistentes/componentes/rascunho-001/itens-configuracao",
-              "host": ["{{baseUrl}}"],
-              "path": ["assistentes", "componentes", "rascunho-001", "itens-configuracao"]
-            },
-            "description": "Atualiza itens de configuração (ICs) do componente (etapa 3)"
-          }
-        },
-        {
-          "name": "Atualizar Dependências (Etapa 4)",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"componentesDependenciaIds\": [\"cmp-789\"]\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/assistentes/componentes/rascunho-001/dependencias",
-              "host": ["{{baseUrl}}"],
-              "path": ["assistentes", "componentes", "rascunho-001", "dependencias"]
-            },
-            "description": "Atualiza dependências do componente (etapa 4)"
-          }
-        },
-        {
-          "name": "Atualizar Responsáveis (Etapa 5)",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"timeResponsavelId\": \"time-plataforma\",\n  \"timesCocriacaoIds\": [\"time-dom-pagamentos\"]\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/assistentes/componentes/rascunho-001/responsaveis",
-              "host": ["{{baseUrl}}"],
-              "path": ["assistentes", "componentes", "rascunho-001", "responsaveis"]
-            },
-            "description": "Atualiza responsáveis do componente (etapa 5)"
-          }
-        },
-        {
-          "name": "Atualizar Qualidade (Etapa 6)",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"atributosQualidade\": {\n    \"disponibilidade\": \"99.9\",\n    \"tempoRespostaMs\": \"500\"\n  }\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/assistentes/componentes/rascunho-001/qualidade",
-              "host": ["{{baseUrl}}"],
-              "path": ["assistentes", "componentes", "rascunho-001", "qualidade"]
-            },
-            "description": "Atualiza informações de qualidade e SLA (etapa 6)"
-          }
-        },
-        {
-          "name": "Enviar Assistente (Finalizar)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/assistentes/componentes/rascunho-001/enviar",
-              "host": ["{{baseUrl}}"],
-              "path": ["assistentes", "componentes", "rascunho-001", "enviar"]
-            },
-            "description": "Conclui o assistente e cria componente e primeira versão"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Domínios",
-      "item": [
-        {
-          "name": "Listar Domínios",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/dominios",
-              "host": ["{{baseUrl}}"],
-              "path": ["dominios"]
-            },
-            "description": "Lista domínios de negócio"
-          }
-        },
-        {
-          "name": "Listar Subdomínios de um Domínio",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/dominios/dom-pagamentos/subdominios",
-              "host": ["{{baseUrl}}"],
-              "path": ["dominios", "dom-pagamentos", "subdominios"]
-            },
-            "description": "Lista subdomínios de um domínio"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Governança",
-      "item": [
-        {
-          "name": "Listar Solicitações de Aprovação",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/governanca/solicitacoes-aprovacao",
-              "host": ["{{baseUrl}}"],
-              "path": ["governanca", "solicitacoes-aprovacao"]
-            },
-            "description": "Lista solicitações de aprovação pendentes"
-          }
-        },
-        {
-          "name": "Registrar Decisão de Aprovação",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"decisao\": \"APROVAR\",\n  \"comentario\": \"Atende aos critérios de governança.\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/governanca/solicitacoes-aprovacao/sol-001/decisao",
-              "host": ["{{baseUrl}}"],
-              "path": ["governanca", "solicitacoes-aprovacao", "sol-001", "decisao"]
-            },
-            "description": "Registra decisão de aprovação ou rejeição"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Notificações",
-      "item": [
-        {
-          "name": "Listar Notificações",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/notificacoes",
-              "host": ["{{baseUrl}}"],
-              "path": ["notificacoes"]
-            },
-            "description": "Lista notificações do usuário autenticado"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Admin - Domínios",
-      "item": [
-        {
-          "name": "Listar Domínios (Admin)",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/admin/dominios?pagina=0&tamanho=20",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "dominios"],
-              "query": [
-                {
-                  "key": "busca",
-                  "value": "",
-                  "disabled": true
-                },
-                {
-                  "key": "ativo",
-                  "value": "true",
-                  "disabled": true
-                },
-                {
-                  "key": "tipoDominio",
-                  "value": "BUSINESS",
-                  "disabled": true
-                },
-                {
-                  "key": "timeResponsavelId",
-                  "value": "",
-                  "disabled": true
-                },
-                {
-                  "key": "pagina",
-                  "value": "0"
-                },
-                {
-                  "key": "tamanho",
-                  "value": "20"
-                }
-              ]
-            },
-            "description": "Lista domínios de negócio (backoffice)"
-          }
-        },
-        {
-          "name": "Criar Domínio",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codigoDominio\": \"NOVO_DOMINIO\",\n  \"nomeDominio\": \"Novo Domínio\",\n  \"tipoDominio\": \"BUSINESS\",\n  \"descricao\": \"Descrição do novo domínio.\",\n  \"timeResponsavelId\": \"time-plataforma\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/admin/dominios",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "dominios"]
-            },
-            "description": "Cria domínio de negócio"
-          }
-        },
-        {
-          "name": "Obter Domínio por ID (Admin)",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/admin/dominios/dom-pagamentos",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "dominios", "dom-pagamentos"]
-            },
-            "description": "Detalha domínio"
-          }
-        },
-        {
-          "name": "Atualizar Domínio",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nomeDominio\": \"Pagamentos Atualizados\",\n  \"descricao\": \"Domínio atualizado de pagamentos.\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/admin/dominios/dom-pagamentos",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "dominios", "dom-pagamentos"]
-            },
-            "description": "Atualiza domínio"
-          }
-        },
-        {
-          "name": "Desativar Domínio",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/admin/dominios/dom-pagamentos",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "dominios", "dom-pagamentos"]
-            },
-            "description": "Desativa domínio (soft delete)"
-          }
-        },
-        {
-          "name": "Ativar Domínio",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/admin/dominios/dom-pagamentos/ativar",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "dominios", "dom-pagamentos", "ativar"]
-            },
-            "description": "Reativa domínio desativado"
-          }
-        },
-        {
-          "name": "Obter Responsáveis do Domínio",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/admin/dominios/dom-pagamentos/responsaveis",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "dominios", "dom-pagamentos", "responsaveis"]
-            },
-            "description": "Consulta responsáveis de um domínio"
-          }
-        },
-        {
-          "name": "Atualizar Responsáveis do Domínio",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"timeResponsavelId\": \"time-plataforma\",\n  \"timesCocriacaoIds\": [\"time-dom-pagamentos\", \"time-dom-veiculos\"]\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/admin/dominios/dom-pagamentos/responsaveis",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "dominios", "dom-pagamentos", "responsaveis"]
-            },
-            "description": "Atualiza responsáveis de um domínio"
-          }
-        },
-        {
-          "name": "Obter Políticas do Domínio",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/admin/dominios/dom-pagamentos/politicas",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "dominios", "dom-pagamentos", "politicas"]
-            },
-            "description": "Consulta políticas de domínio"
-          }
-        },
-        {
-          "name": "Atualizar Políticas do Domínio",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"politicaCicloVida\": \"PADRAO\",\n  \"politicaAprovacao\": \"REQUER_APROVACAO_DOMINIO\",\n  \"politicaVisibilidade\": \"PUBLICA\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/admin/dominios/dom-pagamentos/politicas",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "dominios", "dom-pagamentos", "politicas"]
-            },
-            "description": "Atualiza políticas de domínio"
-          }
-        },
-        {
-          "name": "Listar Subdomínios (Admin)",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/admin/dominios/dom-pagamentos/subdominios",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "dominios", "dom-pagamentos", "subdominios"]
-            },
-            "description": "Lista subdomínios de um domínio (backoffice)"
-          }
-        },
-        {
-          "name": "Criar Subdomínio",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codigoSubdominio\": \"NOVO_SUB\",\n  \"nomeSubdominio\": \"Novo Subdomínio\",\n  \"descricao\": \"Descrição do novo subdomínio.\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/admin/dominios/dom-pagamentos/subdominios",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "dominios", "dom-pagamentos", "subdominios"]
-            },
-            "description": "Cria subdomínio dentro de um domínio"
-          }
-        },
-        {
-          "name": "Reordenar Subdomínios",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"ordemSubdominios\": [\n    \"sub-parcelamento\",\n    \"sub-cobranca\"\n  ]\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/admin/dominios/dom-pagamentos/subdominios/reordenar",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "dominios", "dom-pagamentos", "subdominios", "reordenar"]
-            },
-            "description": "Reordena lista de subdomínios de um domínio"
-          }
-        },
-        {
-          "name": "Obter Estatísticas do Domínio",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/admin/dominios/dom-pagamentos/estatisticas",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "dominios", "dom-pagamentos", "estatisticas"]
-            },
-            "description": "Estatísticas de uso de um domínio"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Admin - Subdomínios",
-      "item": [
-        {
-          "name": "Obter Subdomínio por ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/admin/subdominios/sub-parcelamento",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "subdominios", "sub-parcelamento"]
-            },
-            "description": "Detalha subdomínio"
-          }
-        },
-        {
-          "name": "Atualizar Subdomínio",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nomeSubdominio\": \"Parcelamento Atualizado\",\n  \"descricao\": \"Subdomínio de parcelamento atualizado.\",\n  \"ordemExibicao\": 1,\n  \"ativo\": true\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/admin/subdominios/sub-parcelamento",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "subdominios", "sub-parcelamento"]
-            },
-            "description": "Atualiza subdomínio"
-          }
-        },
-        {
-          "name": "Desativar Subdomínio",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/admin/subdominios/sub-parcelamento",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "subdominios", "sub-parcelamento"]
-            },
-            "description": "Desativa subdomínio (soft delete)"
-          }
-        },
-        {
-          "name": "Ativar Subdomínio",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/admin/subdominios/sub-parcelamento/ativar",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "subdominios", "sub-parcelamento", "ativar"]
-            },
-            "description": "Reativa subdomínio desativado"
+            "description": "Detalha componente (endpoint auxiliar)"
           }
         }
       ]
@@ -1809,4 +463,3 @@
     }
   ]
 }
-

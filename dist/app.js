@@ -9,17 +9,9 @@ const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const swagger_1 = require("./config/swagger");
 // Routes
 const autenticacao_routes_1 = __importDefault(require("./routes/autenticacao.routes"));
+const ui_routes_1 = __importDefault(require("./routes/ui.routes"));
 const usuarios_routes_1 = __importDefault(require("./routes/usuarios.routes"));
-const times_routes_1 = __importDefault(require("./routes/times.routes"));
-const perfis_acesso_routes_1 = __importDefault(require("./routes/perfis-acesso.routes"));
-const permissoes_routes_1 = __importDefault(require("./routes/permissoes.routes"));
 const componentes_routes_1 = __importDefault(require("./routes/componentes.routes"));
-const assistentes_routes_1 = __importDefault(require("./routes/assistentes.routes"));
-const itens_configuracao_routes_1 = __importDefault(require("./routes/itens-configuracao.routes"));
-const dominios_routes_1 = __importDefault(require("./routes/dominios.routes"));
-const governanca_routes_1 = __importDefault(require("./routes/governanca.routes"));
-const notificacoes_routes_1 = __importDefault(require("./routes/notificacoes.routes"));
-const admin_routes_1 = __importDefault(require("./routes/admin.routes"));
 const app = (0, express_1.default)();
 // Middlewares
 app.use((0, cors_1.default)());
@@ -37,17 +29,9 @@ app.get('/health', (_req, res) => {
 });
 // API Routes
 app.use('/autenticacao', autenticacao_routes_1.default);
+app.use('/ui', ui_routes_1.default);
 app.use('/usuarios', usuarios_routes_1.default);
-app.use('/times', times_routes_1.default);
-app.use('/perfis-acesso', perfis_acesso_routes_1.default);
-app.use('/permissoes', permissoes_routes_1.default);
 app.use('/componentes', componentes_routes_1.default);
-app.use('/assistentes', assistentes_routes_1.default);
-app.use('/itens-configuracao', itens_configuracao_routes_1.default);
-app.use('/dominios', dominios_routes_1.default);
-app.use('/governanca', governanca_routes_1.default);
-app.use('/notificacoes', notificacoes_routes_1.default);
-app.use('/admin', admin_routes_1.default);
 // 404 handler
 app.use((_req, res) => {
     res.status(404).json({ error: 'Rota não encontrada' });

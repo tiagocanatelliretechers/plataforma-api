@@ -5,17 +5,9 @@ import { openApiDocument } from './config/swagger';
 
 // Routes
 import autenticacaoRoutes from './routes/autenticacao.routes';
+import uiRoutes from './routes/ui.routes';
 import usuariosRoutes from './routes/usuarios.routes';
-import timesRoutes from './routes/times.routes';
-import perfisAcessoRoutes from './routes/perfis-acesso.routes';
-import permissoesRoutes from './routes/permissoes.routes';
 import componentesRoutes from './routes/componentes.routes';
-import assistentesRoutes from './routes/assistentes.routes';
-import itensConfiguracaoRoutes from './routes/itens-configuracao.routes';
-import dominiosRoutes from './routes/dominios.routes';
-import governancaRoutes from './routes/governanca.routes';
-import notificacoesRoutes from './routes/notificacoes.routes';
-import adminRoutes from './routes/admin.routes';
 
 const app: Application = express();
 
@@ -39,17 +31,9 @@ app.get('/health', (_req: Request, res: Response) => {
 
 // API Routes
 app.use('/autenticacao', autenticacaoRoutes);
+app.use('/ui', uiRoutes);
 app.use('/usuarios', usuariosRoutes);
-app.use('/times', timesRoutes);
-app.use('/perfis-acesso', perfisAcessoRoutes);
-app.use('/permissoes', permissoesRoutes);
 app.use('/componentes', componentesRoutes);
-app.use('/assistentes', assistentesRoutes);
-app.use('/itens-configuracao', itensConfiguracaoRoutes);
-app.use('/dominios', dominiosRoutes);
-app.use('/governanca', governancaRoutes);
-app.use('/notificacoes', notificacoesRoutes);
-app.use('/admin', adminRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
@@ -63,4 +47,3 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 export default app;
-

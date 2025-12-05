@@ -7,4 +7,3 @@ const router = Router();
 router.post('/token', autenticacaoController.gerarToken);
 
 export default router;
-

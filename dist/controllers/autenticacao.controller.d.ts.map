@@ -1,1 +1,1 @@
-{"version":3,"file":"autenticacao.controller.d.ts","sourceRoot":"","sources":["../../src/controllers/autenticacao.controller.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAG5C,eAAO,MAAM,sBAAsB;uBACd,OAAO,OAAO,QAAQ;CAI1C,CAAC"}
+{"version":3,"file":"autenticacao.controller.d.ts","sourceRoot":"","sources":["../../src/controllers/autenticacao.controller.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAG5C,eAAO,MAAM,sBAAsB;uBAEd,OAAO,OAAO,QAAQ;CAG1C,CAAC"}

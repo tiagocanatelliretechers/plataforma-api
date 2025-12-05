@@ -1,71 +1,356 @@
-export const componentesResumoMock = [
+// Dados de componentes
+export const componentesMock = [
   {
-    idComponente: 'cmp-123',
+    idComponente: 'cmp-000123',
     codigoComponente: 'PAGTO_BOLETO',
     nomeComponente: 'Parcelamento de Boletos',
     tipoComponente: 'BUSINESS',
-    dominioId: 'dom-pagamentos',
-    nomeDominio: 'Pagamentos',
-    subdominioId: 'sub-parcelamento',
-    nomeSubdominio: 'Parcelamento',
-    versaoMaisRecente: '1.0.0',
+    dominio: 'Pagamentos',
     estadoCicloVida: 'EM_PRODUCAO',
   },
   {
-    idComponente: 'cmp-456',
-    codigoComponente: 'CONS_DEBITOS',
+    idComponente: 'cmp-000456',
+    codigoComponente: 'CONS_DEBITOS_VEIC',
     nomeComponente: 'Consulta de Débitos Veiculares',
     tipoComponente: 'BUSINESS',
-    dominioId: 'dom-veiculos',
-    nomeDominio: 'Veículos',
-    subdominioId: 'sub-consulta-debitos',
-    nomeSubdominio: 'Consulta de Débitos',
-    versaoMaisRecente: '0.9.0',
+    dominio: 'Veículos',
     estadoCicloVida: 'EM_HOMOLOGACAO',
   },
   {
-    idComponente: 'cmp-789',
-    codigoComponente: 'AUTH_SERVICE',
-    nomeComponente: 'Serviço de Autenticação',
+    idComponente: 'cmp-000789',
+    codigoComponente: 'EMAIL_SMTP',
+    nomeComponente: 'Serviço SMTP Corporativo',
     tipoComponente: 'TECHNICAL',
-    dominioId: 'dom-plataforma',
-    nomeDominio: 'Plataforma',
-    subdominioId: 'sub-seguranca',
-    nomeSubdominio: 'Segurança',
-    versaoMaisRecente: '2.1.0',
+    dominio: 'Plataforma',
     estadoCicloVida: 'EM_PRODUCAO',
   },
 ];
 
-export const componentesDetalheMock = componentesResumoMock.map((c) => ({
+export const componentesDetalheMock = componentesMock.map((c) => ({
   ...c,
-  descricao: `Componente responsável pelo ${c.nomeComponente.toLowerCase()}.`,
-  timeResponsavelId: 'time-plataforma',
-  timeResponsavelNome: 'Time Plataforma Componentes',
+  descricao: `Componente responsável por ${c.nomeComponente.toLowerCase()}.`,
   tags: c.nomeComponente.toLowerCase().split(' '),
-  dataCriacao: '2024-01-15T10:30:00Z',
-  dataAtualizacao: '2024-03-20T14:45:00Z',
 }));
 
 export const paginaComponentesMock = {
-  conteudo: componentesResumoMock,
+  conteudo: componentesMock,
   pagina: 0,
   tamanho: 20,
-  totalElementos: componentesResumoMock.length,
+  totalElementos: componentesMock.length,
   totalPaginas: 1,
 };
 
-export const estatisticasComponenteMock = {
-  totalComponentes: 45,
-  totalComponentesBusiness: 30,
-  totalComponentesExtension: 8,
-  totalComponentesTechnical: 7,
-  totalDominios: 10,
-  totalSubdominios: 35,
+// UI - Tela de lista de componentes
+export const componentesListaTelaMock = {
+  paginaId: 'lista-componentes',
+  titulo: 'Catálogo de Componentes',
+  filtros: [
+    {
+      id: 'busca',
+      type: 'text',
+      label: 'Buscar',
+      placeholder: 'Nome, código ou tag',
+    },
+    {
+      id: 'tipoComponente',
+      type: 'select',
+      label: 'Tipo de Componente',
+      placeholder: 'Selecione',
+      options: [
+        { value: 'BUSINESS', label: 'Business' },
+        { value: 'EXTENSION', label: 'Extension' },
+        { value: 'TECHNICAL', label: 'Technical' },
+      ],
+    },
+    {
+      id: 'dominioId',
+      type: 'select',
+      label: 'Domínio',
+      placeholder: 'Selecione um domínio',
+      dataSource: {
+        type: 'api',
+        endpoint: '/dominios',
+        valueField: 'idDominio',
+        labelField: 'nomeDominio',
+      },
+    },
+  ],
+  colunas: [
+    { id: 'codigoComponente', label: 'Código', width: '150px', sortable: true },
+    { id: 'nomeComponente', label: 'Nome', width: '260px', sortable: true },
+    { id: 'tipoComponente', label: 'Tipo', width: '140px', sortable: true },
+    { id: 'dominio', label: 'Domínio', width: '180px', sortable: true },
+    { id: 'estadoCicloVida', label: 'Estado', width: '140px', sortable: true },
+  ],
+  acoesLinha: [
+    {
+      id: 'ver-detalhes',
+      label: 'Ver Detalhes',
+      icon: 'eye',
+      tipo: 'link',
+      acao: 'rota',
+      rotaFrontend: '/componentes/{idComponente}',
+    },
+    {
+      id: 'abrir-em-jira',
+      label: 'Abrir em Jira',
+      icon: 'jira',
+      tipo: 'secondary',
+      acao: 'link-externo',
+      endpoint: 'https://jira.empresa.com/browse/{codigoComponente}',
+    },
+  ],
+  acoesPagina: [
+    {
+      id: 'criar-componente',
+      label: 'Criar Componente',
+      icon: 'plus',
+      tipo: 'primary',
+      acao: 'rota',
+      rotaFrontend: '/componentes/novo',
+    },
+  ],
+  paginacao: {
+    pagina: 0,
+    tamanho: 20,
+    totalElementos: componentesMock.length,
+    totalPaginas: 1,
+  },
+  linhas: componentesMock,
 };
 
-export const dependenciasComponenteMock = {
-  dependenciasEntrada: [componentesResumoMock[2]],
-  dependenciasSaida: [componentesResumoMock[1]],
+// UI - Wizard de criação de componente
+export const componenteWizardTelaMock = {
+  formId: 'create-component',
+  version: 1,
+  title: 'Criar Novo Componente',
+  description: 'Siga os passos para criar um novo componente',
+  submit: {
+    method: 'POST',
+    endpoint: '/componentes',
+  },
+  steps: [
+    {
+      id: 'component-type',
+      order: 1,
+      label: 'Tipo',
+      title: 'Tipo',
+      description: 'Escolha o tipo de componente',
+      type: 'form',
+      fields: [
+        {
+          id: 'tipoComponente',
+          type: 'card_select',
+          label: 'Tipo de Componente',
+          helperText: 'Escolha o tipo de componente',
+          required: true,
+          options: [
+            {
+              value: 'business',
+              label: 'Business',
+              description: 'Componente de negócio que representa uma funcionalidade completa',
+            },
+            {
+              value: 'extension',
+              label: 'Extension',
+              description: 'Extensão que adiciona funcionalidades a um Business Component',
+            },
+            {
+              value: 'technical',
+              label: 'Technical',
+              description: 'Serviço técnico reutilizável (ex: SMTP, Auth, Cache)',
+            },
+          ],
+          validation: {
+            required: true,
+          },
+        },
+      ],
+    },
+    {
+      id: 'basic-info',
+      order: 2,
+      label: 'Informações Básicas',
+      title: 'Informações Básicas',
+      description: 'Dados principais do componente',
+      type: 'form',
+      fields: [
+        {
+          id: 'nomeComponente',
+          type: 'text',
+          label: 'Nome do Componente',
+          placeholder: 'Ex: Aprovação de Reserva',
+          required: true,
+          validation: {
+            required: true,
+            minLength: 3,
+            maxLength: 120,
+          },
+        },
+        {
+          id: 'valueStreamId',
+          type: 'select',
+          label: 'Value Stream',
+          placeholder: 'Selecione um Value Stream',
+          required: true,
+          dataSource: {
+            type: 'api',
+            endpoint: '/value-streams',
+            valueField: 'id',
+            labelField: 'nome',
+          },
+          validation: {
+            required: true,
+          },
+        },
+        {
+          id: 'teamId',
+          type: 'select',
+          label: 'Time Responsável',
+          placeholder: 'Selecione um Time',
+          required: true,
+          dataSource: {
+            type: 'api',
+            endpoint: '/times',
+            valueField: 'idTime',
+            labelField: 'nomeTime',
+          },
+          validation: {
+            required: true,
+          },
+        },
+        {
+          id: 'tags',
+          type: 'tags',
+          label: 'Tags',
+          placeholder: 'reserva, aprovação, veículos',
+          helperText: 'Separadas por vírgula',
+          required: false,
+        },
+        {
+          id: 'descricao',
+          type: 'textarea',
+          label: 'Descrição',
+          placeholder: 'Descreva o componente...',
+          required: true,
+          validation: {
+            required: true,
+            minLength: 10,
+            maxLength: 2000,
+          },
+        },
+      ],
+    },
+    {
+      id: 'configurations',
+      order: 3,
+      label: 'Configurações',
+      title: 'Configurações',
+      description: 'Configurações específicas',
+      type: 'form',
+      fields: [
+        {
+          id: 'extensionComponents',
+          type: 'checkbox_group',
+          label: 'Extension Components',
+          helperText: '(selecione pelo menos um, se aplicável)',
+          required: false,
+          dataSource: {
+            type: 'api',
+            endpoint: '/componentes?tipoComponente=EXTENSION',
+            valueField: 'idComponente',
+            labelField: 'nomeComponente',
+          },
+          validation: {
+            minSelected: 0,
+          },
+        },
+        {
+          id: 'technicalComponents',
+          type: 'checkbox_group',
+          label: 'Technical Components',
+          helperText: '(selecione pelo menos um)',
+          required: true,
+          dataSource: {
+            type: 'api',
+            endpoint: '/componentes?tipoComponente=TECHNICAL',
+            valueField: 'idComponente',
+            labelField: 'nomeComponente',
+          },
+          validation: {
+            required: true,
+            minSelected: 1,
+          },
+        },
+        {
+          id: 'infrastructureConfigs',
+          type: 'checkbox_group',
+          label: 'Configurações de Infraestrutura',
+          required: false,
+          options: [
+            { value: 'create-microfrontend', label: 'Criar Microfrontend' },
+            { value: 'configure-database', label: 'Configurar Banco de Dados' },
+            { value: 'configure-api-gateway', label: 'Configurar API Gateway' },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'automations',
+      order: 4,
+      label: 'Automatizações',
+      title: 'Automatizações',
+      description: 'Automatizações a executar',
+      type: 'form',
+      fields: [
+        {
+          id: 'automations',
+          type: 'checkbox_group',
+          label: 'Automatizações',
+          helperText: 'Selecione as automatizações que devem ser executadas ao criar o componente',
+          required: false,
+          options: [
+            { value: 'create-git-repo', label: 'Criar repositório no Git' },
+            { value: 'create-ci-cd-pipeline', label: 'Criar pipeline CI/CD' },
+            { value: 'create-api-gateway-config', label: 'Criar configuração no API Gateway' },
+            { value: 'create-sso-realm', label: 'Criar Realm no SSO' },
+            { value: 'create-jira-cards', label: 'Criar cards no Jira' },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'summary',
+      order: 5,
+      label: 'Resumo',
+      title: 'Resumo',
+      description: 'Revise e confirme',
+      type: 'summary',
+      layout: [
+        {
+          title: 'Tipo',
+          fields: ['tipoComponente'],
+        },
+        {
+          title: 'Informações Básicas',
+          fields: ['nomeComponente', 'valueStreamId', 'teamId', 'tags', 'descricao'],
+        },
+        {
+          title: 'Dependências Selecionadas',
+          groups: [
+            { title: 'Extensions', field: 'extensionComponents' },
+            { title: 'Technicals', field: 'technicalComponents' },
+          ],
+        },
+        {
+          title: 'Infraestrutura',
+          fields: ['infrastructureConfigs'],
+        },
+        {
+          title: 'Automatizações selecionadas',
+          fields: ['automations'],
+        },
+      ],
+    },
+  ],
 };
-

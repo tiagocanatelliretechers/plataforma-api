@@ -1,0 +1,77 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.layoutAreaLogadaMock = void 0;
+exports.layoutAreaLogadaMock = {
+    app: {
+        id: 'arch-hub',
+        nome: 'Arch Hub',
+        subTitulo: 'Porto Seguro',
+        logoUrl: 'https://cdn.empresa.com/logos/arch-hub.png',
+    },
+    usuario: {
+        idUsuario: 'usr-0001',
+        nomeExibicao: 'João Silva',
+        email: 'joao.silva@porto.com.br',
+        iniciais: 'JS',
+        avatarUrl: null,
+    },
+    menu: [
+        {
+            id: 'dashboard',
+            label: 'Dashboard',
+            icone: 'grid',
+            rotaFrontend: '/dashboard',
+            ativo: true,
+            habilitado: true,
+        },
+        {
+            id: 'componentes',
+            label: 'Componentes',
+            icone: 'cube',
+            rotaFrontend: '/componentes',
+            ativo: false,
+            habilitado: true,
+        },
+        {
+            id: 'automatizacoes',
+            label: 'Automações',
+            icone: 'zap',
+            rotaFrontend: '/automatizacoes',
+            ativo: false,
+            habilitado: true,
+        },
+        {
+            id: 'auditoria',
+            label: 'Auditoria',
+            icone: 'file-text',
+            rotaFrontend: '/auditoria',
+            ativo: false,
+            habilitado: true,
+        },
+        {
+            id: 'usuarios-permissoes',
+            label: 'Usuários & Permissões',
+            icone: 'users',
+            rotaFrontend: '/usuarios',
+            ativo: false,
+            habilitado: true,
+        },
+        {
+            id: 'ai-assistant',
+            label: 'AI Assistant (Futuro)',
+            icone: 'bot',
+            rotaFrontend: '/ai-assistant',
+            ativo: false,
+            habilitado: false,
+        },
+        {
+            id: 'canvas',
+            label: 'Canvas (Futuro)',
+            icone: 'layout',
+            rotaFrontend: '/canvas',
+            ativo: false,
+            habilitado: false,
+        },
+    ],
+};
+//# sourceMappingURL=ui-layout.mocks.js.map
